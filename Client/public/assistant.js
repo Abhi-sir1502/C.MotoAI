@@ -219,7 +219,7 @@
             return;
           }
 
-          const res = await fetch(`https://c-motoaiserver.onrender.com//api/assistant/ask`, {
+          const res = await fetch(`https://c-motoaiserver.onrender.com/api/assistant/ask`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
