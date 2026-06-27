@@ -132,7 +132,7 @@
         console.error("Moto AI Error: data-user-id attribute is missing from script tag!");
         return;
       }
-      const res = await fetch(`https://c-motoaiserver.onrender.com//api/assistant/config/${userId}`);
+      const res = await fetch(`https://c-motoaiserver.onrender.com/api/assistant/config/${userId}`);
       const data = await res.json();
 
       if (data?.user) {
@@ -219,7 +219,7 @@
             return;
           }
 
-          const res = await fetch("https://c-motoaiserver.onrender.com//api/assistant/ask", {
+          const res = await fetch(`https://c-motoaiserver.onrender.com//api/assistant/ask`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
