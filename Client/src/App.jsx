@@ -9,9 +9,8 @@ import Builder from './pages/Builder';
 import Billing from './pages/Billing';
 import {Toaster} from "react-hot-toast"
 // Dono jagah bilkul same base URL hona chahiye
-export const ServerUrl = "http://localhost:8000";
-export const CLIENT_URL =  "http://localhost:5173";
-
+export const ServerUrl = "https://c-motoaiserver.onrender.com";
+export const CLIENT_URL = "https://motoai.onrender.com";
 
 function App() {
   const [user, setUser] = useState(null);

@@ -14,7 +14,7 @@
   // ===== Load assistant.css (must be in /public folder) =====
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "http://localhost:5173/assistant.css";
+  link.href = "https://motoai.onrender.com/assistant.css";
   document.head.appendChild(link);
 
   // ===== Build the popup chat window =====
@@ -46,7 +46,7 @@
       </div>
       <div class="moto-bottom">
         <button class="moto-mic">
-          <img src="http://localhost:5173/mic.svg" alt="mic" class="moto-mic-icon" />
+          <img src="https://motoai.onrender.com/mic.svg" alt="mic" class="moto-mic-icon" />
         </button>
       </div>
     </div>
@@ -57,7 +57,7 @@
   // ===== Floating toggle button =====
   const button = document.createElement("button");
   button.className = `moto-btn theme-${theme}`;
-  button.innerHTML = `<img src="http://localhost:5173/logo.jpeg" alt="logo" />`;
+  button.innerHTML = `<img src="https://motoai.onrender.com/logo.jpeg" alt="logo" />`;
   document.body.appendChild(button);
 
   // ===== Grab popup elements for voice interaction =====
@@ -132,7 +132,7 @@
         console.error("Moto AI Error: data-user-id attribute is missing from script tag!");
         return;
       }
-      const res = await fetch(`http://localhost:8000/api/assistant/config/${userId}`);
+      const res = await fetch(`https://c-motoaiserver.onrender.com//api/assistant/config/${userId}`);
       const data = await res.json();
 
       if (data?.user) {
@@ -219,7 +219,7 @@
             return;
           }
 
-          const res = await fetch("http://localhost:8000/api/assistant/ask", {
+          const res = await fetch("https://c-motoaiserver.onrender.com//api/assistant/ask", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

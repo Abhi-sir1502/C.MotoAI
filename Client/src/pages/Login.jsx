@@ -14,7 +14,7 @@ import { signInWithPopup } from 'firebase/auth'; // 👈 Popup standard import
 import { provider, auth } from '../utils/firebase';
 import { useNavigate } from 'react-router-dom';
 
-const ServerUrl = "http://localhost:8000";
+const ServerUrl = "https://c-motoaiserver.onrender.com";
 
 function Login({ setUser }) {
   const navigate = useNavigate();
