@@ -12,29 +12,27 @@ dotenv.config()
 
 const app = express()
 
-const privateCors = cors({
-  origin: ["http://localhost:5173"],
-  credentials: true
-});
+// 🔥 BADLAV 1: CORS ko globally sabse upar lagayein
+// Yeh private aur public dono ka kaam automatic handle karega bina kisi error ke
+app.use(cors({
+  origin: ["https://motoai.onrender.com"], 
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
-const publicCors = cors({
-    origin: "*",
-});
-
-// 🔥 STEP 1: Saare main middlewares ko sabse upar rakhein
 app.use(express.json())
 app.use(cookieParser())
 
-// 🔥 STEP 2: Routes ke andar hi middleware sahi order me chalenge
 app.get("/" , (req, res)=> {
     res.json("Hello from Server")
 })
 
-app.use("/api/auth" , privateCors , authRouter)
-app.use("/api/user" , privateCors , userRouter)
-app.use("/api/billing" , privateCors , billingRouter)
-
-app.use("/api/assistant" , publicCors , assistantRouter)
+// Routes ab bilkul clean rahenge
+app.use("/api/auth" , authRouter)
+app.use("/api/user" , userRouter)
+app.use("/api/billing" , billingRouter)
+app.use("/api/assistant" , assistantRouter)
 
 const PORT = process.env.PORT
 app.listen(PORT , ()=>{
