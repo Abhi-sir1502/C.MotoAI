@@ -16,27 +16,26 @@ export const googleAuth = async (req, res) => {
       user = await User.create({ name, email })
     }
 
-    const token = await genToken(user._id)
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "Strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    })
+    // 🚀 Token generate hoga aur cookie token.js ke andar hi set ho chuki hai
+    await genToken(user._id, res);
+    
+    // 🔥 Purani res.cookie() block ko yahan se hata diya hai taaki options overwrite na ho
 
     return res.status(200).json(user)
   } catch (error) {
-    return res.status(500).json({ message: `Google auth error ${error}` })
+    return res.status(500).json({ message: `Google auth error ${error}`})
   }
 }
 
 // Logout: clears the auth cookie
 export const logout = async (req, res) => {
   try {
+    // 🔒 Logout par bhi clearCookie ko production-ready kiya secure aur none ke saath
     await res.clearCookie("token", {
+      path: "/",
       httpOnly: true,
-      secure: false,
-      sameSite: "Strict"
+      secure: true,      // Production HTTPS ke liye
+      sameSite: "none"   // Cross-origin aur mobile support ke liye
     })
     return res.status(200).json({ message: "Logout Successfully" });
   } catch (error) {
