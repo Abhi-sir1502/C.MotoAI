@@ -93,7 +93,7 @@
         try {
           recognition.start();
         } catch (e) {
-          console.log("Recognition start bypass:", e);
+          console.log("Recognition start bypass:");
         }
       } else {
         status.innerText = "Tap button to Speak";
@@ -138,8 +138,14 @@
       if (data?.user) {
         assistantConfig = data.user;
         applyConfig();
+
+        if(open && !hasGreeted) {
+          hasGreeted = true;
+          const greeting = `Hello, I 'm ${assistantConfig.assistantName || "Moto AI"}. How can I help you`;
+          speak(greeting);
+        } 
       }
-    } catch (error) {
+    } catch (error) { 
       console.log("Assistant Load Error:", error);
     }
   };
@@ -263,12 +269,12 @@
         try {
           recognition.start();
         } catch (e) {
-          console.log("OnEnd auto-restart bypass:", e);
+          console.log("OnEnd auto-restart bypass:");
         }
       }
-    };
-
-    recognition.onerror = (event) => {
+    }
+    recognition.onerror = (event)
+     => {
       console.log("Speech Error:", event.error);
       // Agar 'no-speech' error aata hai bina manual stop ke, tab bhi listen loop chalte rehna chahiye
       if (isListening && !aiReplying) {
