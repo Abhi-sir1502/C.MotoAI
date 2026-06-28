@@ -54,10 +54,17 @@
 
   document.body.appendChild(popup);
 
-  // ===== Floating toggle button =====
+ // ===== Floating toggle button =====
   const button = document.createElement("button");
   button.className = `moto-btn theme-${theme}`;
-  button.innerHTML = <img src="./logo.jpeg" alt="logo" />;
+  
+  // 🚀 Fixed: Pura URL daal diya aur saath me error filter lagaya hai taaki image missing hone par bhi crash na ho
+  button.innerHTML = `
+    <img src="https://motoai.onrender.com/logo.jpeg" 
+         alt="logo" 
+         onerror="this.onerror=null; this.src='https://picsum.photos/50';" 
+         style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+  `;
   document.body.appendChild(button);
 
   // ===== Grab popup elements for voice interaction =====
