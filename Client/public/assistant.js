@@ -54,13 +54,14 @@
 
   document.body.appendChild(popup);
 
- // ===== Floating toggle button =====
+  // ===== Floating toggle button =====
   const button = document.createElement("button");
   button.className = `moto-btn theme-${theme}`;
   
-  // 🚀 Fixed: Pura URL daal diya aur saath me error filter lagaya hai taaki image missing hone par bhi crash na ho
+  // Dynamic fallback handle: logo.jpeg missing hone par placeholder use karega
   button.innerHTML = `
-    <img src="https://motoai.onrender.com/logo.jpeg" 
+    <img id="moto-main-logo" 
+         src="https://motoai.onrender.com/logo.jpeg" 
          alt="logo" 
          onerror="this.onerror=null; this.src='https://picsum.photos/50';" 
          style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
@@ -77,7 +78,7 @@
   // ===== Text-to-Speech: makes the assistant "talk" =====
   const speak = (text) => {
     window.speechSynthesis.cancel();
-    aiReplying = true; // AI bolna shuru kar raha hai
+    aiReplying = true; 
 
     aiText.innerHTML = text;
     status.innerHTML = "AI Speaking...";
@@ -92,19 +93,21 @@
 
     // ===== Speech Synthesis End Handler =====
     speech.onend = () => {
-      aiReplying = false; // AI bolna khatam kar chuka hai
+      aiReplying = false; 
       
       if (isListening && recognition) {
         status.innerText = "Listening instantly...";
         wave.style.opacity = "1";
         
         try {
-          recognition.stop(); 
+          recognition.abort(); // Purane buffers clean karo duplicate crash se bachne ke liye
           setTimeout(() => {
-            if (isListening && !aiReplying) recognition.start();
-          }, 300);
+            if (isListening && !aiReplying) {
+              try { recognition.start(); } catch(err) {}
+            }
+          }, 400); // Stable gap window
         } catch (e) {
-          // Safe bypass
+          // Controlled safe bypass
         }
       } else {
         status.innerText = "Tap button to Speak";
@@ -113,7 +116,7 @@
     };
 
     window.speechSynthesis.speak(speech);
-  }; // 🚀 Fixed: Ab speak function perfectly close ho gaya hai
+  };
 
   // ===== Toggle popup open/close + greet on first open =====
   let open = false;
@@ -129,7 +132,7 @@
       isListening = false;
       aiReplying = false;
       window.speechSynthesis.cancel();
-      if (recognition) recognition.stop();
+      if (recognition) { try { recognition.stop(); } catch(e){} }
       status.innerText = "Tap button to Speak";
       wave.style.opacity = "0";
     }
@@ -175,6 +178,12 @@
       Welcome to ${assistantConfig.businessName || "our website"}.
       <br/>
       Ask anything about your website.`;
+
+    // Dynamic config logo overwrite fix
+    const logoImg = document.getElementById("moto-main-logo");
+    if (logoImg && assistantConfig.logo) {
+      logoImg.src = assistantConfig.logo;
+    }
   };
 
   loadAssistant();
@@ -194,17 +203,24 @@
         isListening = false;
         aiReplying = false;
         window.speechSynthesis.cancel();
-        recognition.stop();
+        try { recognition.stop(); } catch(e) {}
         status.innerText = "Tap button to Speak";
         wave.style.opacity = "0";
-        mic.style.background = ""; 
       } else {
         isListening = true;
         aiText.innerText = "";
         userText.innerText = "";
         wave.style.opacity = "1";
         status.innerText = "Listening...";
-        recognition.start();
+        
+        try {
+          recognition.start();
+        } catch (e) {
+          try {
+            recognition.abort();
+            setTimeout(() => { if (isListening) recognition.start(); }, 200);
+          } catch(err) {}
+        }
       }
     };
 
@@ -217,7 +233,7 @@
       if (!text.trim()) return;
 
       userText.innerText = "You: " + text;
-      recognition.stop();
+      try { recognition.stop(); } catch(err) {}
 
       (async () => {
         try {
@@ -273,16 +289,23 @@
           try {
             if (isListening && !aiReplying) recognition.start();
           } catch (e) {
-            // Safe bypass
+            // Controlled safe recovery
           }
-        }, 300);
+        }, 400);
       }
     };
 
+    // ===== Recognition Error Handler =====
     recognition.onerror = (event) => {
-      console.log("Speech Error:", event.error);
+      console.log("Speech Error logged:", event.error);
+      if (event.error === 'network') {
+        status.innerText = "Network slow, adjusting...";
+        try { recognition.abort(); } catch(e) {}
+      }
       if (isListening && !aiReplying) {
-        status.innerText = "Listening instantly...";
+        setTimeout(() => {
+          try { if (isListening && !aiReplying) recognition.start(); } catch (e) {}
+        }, 500);
       }
     };
 
