@@ -57,7 +57,7 @@
   // ===== Floating toggle button =====
   const button = document.createElement("button");
   button.className = `moto-btn theme-${theme}`;
-  button.innerHTML = `<img src="./logo.jpeg" alt="logo" />`;
+  button.innerHTML = <img src="./logo.jpeg" alt="logo" />;
   document.body.appendChild(button);
 
   // ===== Grab popup elements for voice interaction =====
@@ -75,7 +75,7 @@
     aiText.innerHTML = text;
     status.innerHTML = "AI Speaking...";
     wave.style.opacity = "1";
-    mic.classList.add("moto-mic-speaking"); // CSS style handle karne ke liye (Optional)
+    mic.classList.add("moto-mic-speaking");
 
     const speech = new SpeechSynthesisUtterance(text);
     speech.lang = "hi-IN";
@@ -83,17 +83,21 @@
     speech.pitch = 1;
     speech.volume = 1;
 
+    // ===== Speech Synthesis End Handler =====
     speech.onend = () => {
       aiReplying = false; // AI bolna khatam kar chuka hai
       
-      // 🔥 Continuous Check: Agar user ne manually stop nahi kiya, to automatic instant sunna shuru karo
       if (isListening && recognition) {
         status.innerText = "Listening instantly...";
         wave.style.opacity = "1";
+        
         try {
-          recognition.start();
+          recognition.stop(); 
+          setTimeout(() => {
+            if (isListening && !aiReplying) recognition.start();
+          }, 300);
         } catch (e) {
-          console.log("Recognition start bypass:");
+          // Safe bypass
         }
       } else {
         status.innerText = "Tap button to Speak";
@@ -102,7 +106,7 @@
     };
 
     window.speechSynthesis.speak(speech);
-  };
+  }; // 🚀 Fixed: Ab speak function perfectly close ho gaya hai
 
   // ===== Toggle popup open/close + greet on first open =====
   let open = false;
@@ -115,7 +119,6 @@
       const greeting = `Hello, I'm ${assistantConfig.assistantName || "Moto AI"}. How can I help you?`;
       speak(greeting); 
     } else if (!open) {
-      // Widget band hone par sab shant kar do
       isListening = false;
       aiReplying = false;
       window.speechSynthesis.cancel();
@@ -139,9 +142,9 @@
         assistantConfig = data.user;
         applyConfig();
 
-        if(open && !hasGreeted) {
+        if (open && !hasGreeted) {
           hasGreeted = true;
-          const greeting = `Hello, I 'm ${assistantConfig.assistantName || "Moto AI"}. How can I help you`;
+          const greeting = `Hello, I'm ${assistantConfig.assistantName || "Moto AI"}. How can I help you?`;
           speak(greeting);
         } 
       }
@@ -175,23 +178,20 @@
   if (SpeechRecognition) {
     recognition = new SpeechRecognition();
     recognition.lang = "en-IN";       
-    recognition.continuous = true;  // 🔥 True kiya taaki bar-bar loop chalta rahe
+    recognition.continuous = true;  
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
-    // Mic Button: Yeh Switch ki tarah kaam karega (Chalu -> Poora Band)
     mic.onclick = () => {
       if (isListening) {
-        // Stop Everything (Manual cancellation)
         isListening = false;
         aiReplying = false;
         window.speechSynthesis.cancel();
         recognition.stop();
         status.innerText = "Tap button to Speak";
         wave.style.opacity = "0";
-        mic.style.background = ""; // Reset icon color if modified by CSS
+        mic.style.background = ""; 
       } else {
-        // Start Loop
         isListening = true;
         aiText.innerText = "";
         userText.innerText = "";
@@ -202,7 +202,6 @@
     };
 
     recognition.onresult = (e) => {
-      // Agar AI khud bol raha hai, to echo filter karne ke liye user input skip karo
       if (aiReplying) return;
 
       const lastResultIndex = e.results.length - 1;
@@ -211,8 +210,6 @@
       if (!text.trim()) return;
 
       userText.innerText = "You: " + text;
-      
-      // AI ke bolne se pehle recognition ko temporary pause karo taki echo na ho
       recognition.stop();
 
       (async () => {
@@ -242,7 +239,6 @@
           if (res.ok && data.success) {
             if (data.action === "navigate") {
               speak(data.response);
-              // Agar navigation ho raha hai, toh loop ko khud band karo
               isListening = false; 
               setTimeout(() => {
                 window.location.href = data.path;
@@ -263,19 +259,21 @@
       })();
     };
 
+    // ===== Recognition End Handler =====
     recognition.onend = () => {
-      // Flow control check: Agar user ne session stop nahi kiya hai aur AI chup hai, to restart listen mode
       if (isListening && !aiReplying) {
-        try {
-          recognition.start();
-        } catch (e) {
-          console.log("OnEnd auto-restart bypass:");
-        }
+        setTimeout(() => {
+          try {
+            if (isListening && !aiReplying) recognition.start();
+          } catch (e) {
+            // Safe bypass
+          }
+        }, 300);
       }
-    }
-    recognition.onerror = (event)  => {
+    };
+
+    recognition.onerror = (event) => {
       console.log("Speech Error:", event.error);
-      // Agar 'no-speech' error aata hai bina manual stop ke, tab bhi listen loop chalte rehna chahiye
       if (isListening && !aiReplying) {
         status.innerText = "Listening instantly...";
       }
