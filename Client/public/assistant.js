@@ -57,7 +57,7 @@
   // ===== Floating toggle button =====
   const button = document.createElement("button");
   button.className = `moto-btn theme-${theme}`;
-  button.innerHTML = `<img src="https://motoai.onrender.com/logo.jpeg" alt="logo" />`;
+  button.innerHTML = `<img src="./logo.jpeg" alt="logo" />`;
   document.body.appendChild(button);
 
   // ===== Grab popup elements for voice interaction =====
@@ -273,8 +273,7 @@
         }
       }
     }
-    recognition.onerror = (event)
-     => {
+    recognition.onerror = (event)  => {
       console.log("Speech Error:", event.error);
       // Agar 'no-speech' error aata hai bina manual stop ke, tab bhi listen loop chalte rehna chahiye
       if (isListening && !aiReplying) {
