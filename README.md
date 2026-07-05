@@ -66,7 +66,22 @@ Gemini AI
 
 ## 📸 Screenshots
 
-(Add all screenshots here)
+## 📸 Screenshots
+
+### Home Page
+![Home](assets/screenshots/home.png)
+
+### Dashboard
+![Dashboard](assets/screenshots/dashboard.png)
+
+### Assistant Builder
+![Builder](assets/screenshots/builder.png)
+
+### Billing
+![Billing](assets/screenshots/billing.png)
+
+### Voice Chat
+![Voice Chat](assets/screenshots/voice-chat.png)
 
 ### Dashboard
 
